@@ -18,6 +18,56 @@ Summary = dict[str, float | int | None]
 FieldConfusion = dict[str, dict[str, int]]
 
 
+def harvest_pairs(raw_output: str) -> list[tuple[str, str]]:
+    """DIAGNOSTIC-ONLY lenient harvest of (type, value) pairs from any JSON shape.
+
+    Recovers semantic pairs from outputs that fail the strict payload schema
+    (e.g. `{"FIELD": ["v1"]}` or nested lists). Never used for strict scoring.
+    """
+    try:
+        data = json.loads(raw_output)
+    except ValueError:
+        return []
+    pairs: list[tuple[str, str]] = []
+
+    def add(k: str, v: Any) -> None:
+        if isinstance(v, str) and v.strip():
+            pairs.append((k, v))
+        elif isinstance(v, (int, float)) and not isinstance(v, bool):
+            pairs.append((k, str(v)))
+
+    def walk_typed(node: Any, key: str | None = None) -> None:
+        if isinstance(node, dict):
+            t = node.get("type") or node.get("field") or node.get("name")
+            v = node.get("value") if isinstance(t, str) else None
+            if isinstance(t, str) and v is not None:
+                add(t, v)
+                return
+            for k, v in node.items():
+                if isinstance(v, (list, dict)):
+                    walk_typed(v, k if isinstance(v, list) else None)
+                elif k not in ("evidence", "message_id", "start", "end"):
+                    add(k, v)
+        elif isinstance(node, list):
+            for item in node:
+                walk_typed(item, key)
+        elif key is not None:
+            add(key, node)
+
+    walk_typed(data)
+    return pairs
+
+
+def lenient_tv_counts(example: TaskExample, raw_output: str) -> dict[str, int]:
+    """Multiset (type, value) match of harvested pairs vs gold; diagnostic only."""
+    gold_tv = Counter((f.type, f.value) for f in example.gold)
+    pred_tv = Counter(harvest_pairs(raw_output))
+    tp = sum(min(c, gold_tv[k]) for k, c in pred_tv.items())
+    fp = sum(c - gold_tv[k] for k, c in pred_tv.items() if c > gold_tv[k])
+    fn = sum(c - pred_tv[k] for k, c in gold_tv.items() if c > pred_tv[k])
+    return {"tv_tp": tp, "tv_fp": fp, "tv_fn": fn}
+
+
 def parse_prediction(raw_output: str) -> tuple[FactPayload | None, ParseFlags]:
     """Parse raw model output into a FactPayload; strict json.loads, no markdown repair."""
     try:
@@ -51,6 +101,20 @@ def score_record(example: TaskExample, payload: FactPayload | None) -> Record:
     tp = sum(min(count, gold_keys[key]) for key, count in pred_keys.items())
     fp = sum(count - gold_keys[key] for key, count in pred_keys.items() if count > gold_keys[key])
     fn = sum(count - pred_keys[key] for key, count in gold_keys.items() if count > pred_keys[key])
+
+    # diagnostic decomposition: semantic match (type, value) ignoring evidence,
+    # and type-level match ignoring value — separates extraction semantics from
+    # serialization/evidence mechanics (strict full F1 above stays primary)
+    gold_tv = Counter((f.type, f.value) for f in example.gold)
+    pred_tv = Counter((f.type, f.value) for f in pred_facts)
+    tv_tp = sum(min(c, gold_tv[k]) for k, c in pred_tv.items())
+    tv_fp = sum(c - gold_tv[k] for k, c in pred_tv.items() if c > gold_tv[k])
+    tv_fn = sum(c - pred_tv[k] for k, c in gold_tv.items() if c > pred_tv[k])
+    gold_types = Counter(f.type for f in example.gold)
+    pred_types = Counter(f.type for f in pred_facts)
+    type_tp = sum(min(c, gold_types[k]) for k, c in pred_types.items())
+    type_fp = sum(c - gold_types[k] for k, c in pred_types.items() if c > gold_types[k])
+    type_fn = sum(c - pred_types[k] for k, c in gold_types.items() if c > pred_types[k])
 
     def cited(fact: Fact) -> str | None:
         return content.get(fact.evidence.message_id)
@@ -87,6 +151,12 @@ def score_record(example: TaskExample, payload: FactPayload | None) -> Record:
         "tp": tp,
         "fp": fp,
         "fn": fn,
+        "tv_tp": tv_tp,
+        "tv_fp": tv_fp,
+        "tv_fn": tv_fn,
+        "type_tp": type_tp,
+        "type_fp": type_fp,
+        "type_fn": type_fn,
         "value_exact_copy": value_exact_copy,
         "evidence_valid": evidence_valid,
         "unsupported": unsupported,
@@ -116,6 +186,16 @@ def aggregate(records: list[Record]) -> Summary:
     recall = tp / (tp + fn) if tp + fn else 0.0
     f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
 
+    def prf(t: int, f: int, n: int) -> tuple[float, float, float]:
+        p = t / (t + f) if t + f else 0.0
+        r = t / (t + n) if t + n else 0.0
+        return p, r, (2 * p * r / (p + r) if p + r else 0.0)
+
+    tv_p, tv_r, tv_f1 = prf(total("tv_tp"), total("tv_fp"), total("tv_fn"))
+    ty_p, ty_r, ty_f1 = prf(total("type_tp"), total("type_fp"), total("type_fn"))
+    tv_tp_total = total("tv_tp")
+    type_tp_total = total("type_tp")
+
     pred_n = total("pred_n")
 
     def fact_rate(key: str) -> float:
@@ -135,6 +215,14 @@ def aggregate(records: list[Record]) -> Summary:
         "precision": precision,
         "recall": recall,
         "f1": f1,
+        "type_value_precision": tv_p,
+        "type_value_recall": tv_r,
+        "type_value_f1": tv_f1,
+        "type_precision": ty_p,
+        "type_recall": ty_r,
+        "type_f1": ty_f1,
+        "evidence_accuracy_given_tv": (tp / tv_tp_total) if tv_tp_total else None,
+        "value_exact_match_given_type": (tv_tp_total / type_tp_total) if type_tp_total else None,
         "value_exact_copy_rate": fact_rate("value_exact_copy"),
         "unsupported_fact_rate": fact_rate("unsupported"),
         "evidence_valid_rate": fact_rate("evidence_valid"),

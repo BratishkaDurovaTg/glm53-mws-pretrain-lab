@@ -7,8 +7,7 @@ official-format knowledge leak into the lab code.
 
 from pathlib import Path
 
-from compactex.schemas import Evidence, Fact, Message, TaskExample, TaskSchema
-from compactex.suites import load_suite
+from compactex.schemas import TaskExample
 
 
 def load_official_examples(split: str = "dev") -> list[TaskExample]:

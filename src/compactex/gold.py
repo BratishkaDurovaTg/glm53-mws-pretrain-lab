@@ -41,9 +41,11 @@ KIND_PLURAL = {
 
 STATUS_MODIFIER = {
     "any": ("ALL", "all {plural} mentioned anywhere in the conversation"),
-    "current": ("CURRENT", "{plural} explicitly described as occurring at the present moment"),
+    "current": ("CURRENT",
+                "{plural} explicitly described as occurring at the present moment"),
     "historical": ("HISTORICAL", "{plural} explicitly described as past, earlier or already fixed"),
-    "hypothetical": ("POSSIBLE", "{plural} described as suspected, possible or suggested, not confirmed"),
+    "hypothetical": ("POSSIBLE",
+                     "{plural} described as suspected, possible or suggested, not confirmed"),
     "resolved": ("RESOLVED", "{plural} explicitly described as already fixed"),
 }
 

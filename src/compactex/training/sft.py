@@ -11,7 +11,7 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from compactex.inference import DEFAULT_MODEL_PATH, DEFAULT_REVISION, LocalRunner
+from compactex.inference import DEFAULT_MODEL_PATH, DEFAULT_REVISION
 from compactex.schemas import TaskExample, build_system_prompt, build_user_prompt, target_json
 from compactex.suites import load_suite
 
@@ -65,7 +65,7 @@ def encode_example(tok, ex: TaskExample, cfg: SFTConfig) -> dict | None:
         return None
     n_prompt = len(prompt_ids)
     labels = [-100] * n_prompt + full_ids[n_prompt:]
-    if all(l == -100 for l in labels):
+    if all(label == -100 for label in labels):
         return None
     return {"input_ids": full_ids, "labels": labels}
 

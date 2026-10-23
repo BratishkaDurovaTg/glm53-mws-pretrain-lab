@@ -2,11 +2,11 @@
 
 import json
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 from compactex.evaluation.metrics import aggregate, parse_prediction, score_record
-from compactex.schemas import TaskExample, build_system_prompt, build_user_prompt
+from compactex.schemas import build_system_prompt, build_user_prompt
 from compactex.suites import load_suite
 
 DEFAULT_MODEL_PATH = (
@@ -115,7 +115,7 @@ def run_suite(runner: LocalRunner, suite_path: Path, out_dir: Path,
         try:
             gen = runner.generate(system, user)
             raw, gen_tokens, secs = gen.raw, gen.generated_tokens, gen.seconds
-        except ValueError as exc:  # input_too_long
+        except ValueError:  # input_too_long
             raw, gen_tokens, secs = "", 0, 0.0
         payload, flags = parse_prediction(raw)
         rec = score_record(ex, payload)

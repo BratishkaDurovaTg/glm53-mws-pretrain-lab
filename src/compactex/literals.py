@@ -143,10 +143,12 @@ def pool_of_value(value: str) -> str | None:
         return next(p for p, letters in _NAMED_CODE_FIRST.items() if value[0] in letters)
     if re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", value):
         return next(p for p, chars in _UUID_FIRST.items() if value[0] in chars)
-    if re.fullmatch(r"\d+\.\d+\.\d+\.\d+", value):  # ip BEFORE version: 10.32.4.117 is not a version
+    # ip BEFORE version: 10.32.4.117 must not be classified as a version
+    if re.fullmatch(r"\d+\.\d+\.\d+\.\d+", value):
         return next(p for p, r in _IP_FIRST_OCTET.items() if int(value.split(".")[0]) in r)
     if re.fullmatch(r"v?\d+\.\d+\.\d+.*", value):
-        return next(p for p, r in _VERSION_MAJOR.items() if int(re.match(r"v?(\d+)", value).group(1)) in r)  # type: ignore[union-attr]
+        major = int(re.match(r"v?(\d+)", value).group(1))  # type: ignore[union-attr]
+        return next(p for p, r in _VERSION_MAJOR.items() if major in r)
     if re.fullmatch(r"(INC|REQ|OPS)-\d+", value):
         return {"INC": "train", "REQ": "dev", "OPS": "sealed"}[value[:3]]
     m = re.fullmatch(r"(\w+)-(\w+)(?:-\d{2})?", value)

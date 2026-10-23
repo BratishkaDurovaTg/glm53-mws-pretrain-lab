@@ -15,10 +15,13 @@ from compactex.inference import DEFAULT_MODEL_PATH, DEFAULT_REVISION, LocalRunne
 SUITES = [
     ("dev", ROOT / "data" / "dev" / "examples.jsonl"),
     ("t1_literal_dev", ROOT / "benchmarks" / "literal" / "dev" / "examples.jsonl"),
-    ("t2_unseen_schema_dev", ROOT / "benchmarks" / "unseen_schema" / "dev" / "examples.jsonl"),
-    ("t4_adversarial_dev", ROOT / "benchmarks" / "adversarial" / "dev" / "examples.jsonl"),
+    ("t2_unseen_schema_dev",
+     ROOT / "benchmarks" / "unseen_schema" / "dev" / "examples.jsonl"),
+    ("t4_adversarial_dev",
+     ROOT / "benchmarks" / "adversarial" / "dev" / "examples.jsonl"),
     ("t1_literal_sealed", ROOT / "benchmarks" / "literal" / "sealed" / "examples.jsonl"),
-    ("t2_unseen_schema_sealed", ROOT / "benchmarks" / "unseen_schema" / "sealed" / "examples.jsonl"),
+    ("t2_unseen_schema_sealed",
+     ROOT / "benchmarks" / "unseen_schema" / "sealed" / "examples.jsonl"),
     ("t4_adversarial_sealed", ROOT / "benchmarks" / "adversarial" / "sealed" / "examples.jsonl"),
     ("sealed_final", ROOT / "benchmarks" / "sealed_final" / "examples.jsonl"),
 ]

@@ -52,6 +52,7 @@ def main() -> None:
         m["wall_seconds"] = round(time.perf_counter() - t0, 1)
         results[name] = m
         print(f"[{args.label or 'ckpt'}] {name}: f1={m['f1']:.3f} "
+              f"tv_f1={m['type_value_f1']:.3f} type_f1={m['type_f1']:.3f} "
               f"P={m['precision']:.3f} R={m['recall']:.3f} "
               f"schema={m['schema_valid_rate']:.2f} copy={m['value_exact_copy_rate']:.2f} "
               f"unsup={m['unsupported_fact_rate']:.2f} nofact={m['no_fact_accuracy']}",

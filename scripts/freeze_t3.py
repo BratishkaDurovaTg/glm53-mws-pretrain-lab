@@ -10,11 +10,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "benchmarks" / "technical"))
 
+from handwritten import HANDWRITTEN  # noqa: E402
+
 from compactex.gold import build_field, derive_facts  # noqa: E402
 from compactex.render import substitute_and_locate  # noqa: E402
 from compactex.schemas import Message, TaskExample, TaskSchema, Ticket  # noqa: E402
 from compactex.worldstate import Mention, MessageSpec, WorldState  # noqa: E402
-from handwritten import HANDWRITTEN  # noqa: E402
 
 
 def build(entry: dict, rng: random.Random) -> TaskExample:
