@@ -1,0 +1,12 @@
+{
+  "stage": "smoke",
+  "steps": 2,
+  "n_examples": 8,
+  "loss_first": 1.3609051704406738,
+  "loss_last": 0.7292150780558586,
+  "train_seconds": 26.4,
+  "checkpoints": {
+    "final_only": true
+  },
+  "eval": {}
+}

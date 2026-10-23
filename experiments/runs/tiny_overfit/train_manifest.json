@@ -1,0 +1,12 @@
+{
+  "stage": "tiny_overfit",
+  "steps": 120,
+  "n_examples": 2,
+  "loss_first": 1.3609051704406738,
+  "loss_last": 0.00011621627209024155,
+  "train_seconds": 1063.7,
+  "checkpoints": {
+    "final_only": true
+  },
+  "eval": {}
+}
