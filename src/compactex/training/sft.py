@@ -146,6 +146,7 @@ def train(cfg: SFTConfig, model_path: Path = DEFAULT_MODEL_PATH) -> dict:
     checkpoints: dict[str, dict] = {}
     step, t0 = 0, time.perf_counter()
     eval_result: dict = {}
+    running = 0.0
     while step < steps:
         for micro in range(cfg.grad_accum):
             idx = (step * cfg.grad_accum + micro) % len(feats)
@@ -154,19 +155,27 @@ def train(cfg: SFTConfig, model_path: Path = DEFAULT_MODEL_PATH) -> dict:
             out_logits = model(input_ids=ids, attention_mask=attn).logits
             shift_logits = out_logits[:, :-1, :]
             shift_labels = labels[:, 1:]
+            # bf16 CE (no fp32 upcast of the 152k-vocab logits), sync only once per step
             loss = torch.nn.functional.cross_entropy(
-                shift_logits.reshape(-1, shift_logits.size(-1)).float(),
+                shift_logits.reshape(-1, shift_logits.size(-1)),
                 shift_labels.reshape(-1), ignore_index=-100)
             (loss / cfg.grad_accum).backward()
-            losses.append(loss.item())
+            running = running + loss.detach()
+        losses.append(float(running) / cfg.grad_accum)
+        running = 0.0
         torch.nn.utils.clip_grad_norm_(
             [p for p in model.parameters() if p.requires_grad], 1.0)
         opt.step()
         sched.step()
         opt.zero_grad()
         step += 1
+        del out_logits, shift_logits, loss
+        if step % 25 == 0:
+            torch.mps.empty_cache()
         if step % 10 == 0 or step == steps:
-            print(f"step {step}/{steps} loss {sum(losses[-cfg.grad_accum*10:])/min(len(losses), cfg.grad_accum*10):.4f}", flush=True)
+            recent = losses[-10:]
+            print(f"step {step}/{steps} loss {sum(recent)/len(recent):.4f} "
+                  f"({(time.perf_counter()-t0)/step:.2f}s/step)", flush=True)
         # checkpoints: early (~25%), periodic-eval on dev, final
         if cfg.stage == "pilot" and step == max(steps // 4, 1):
             model.save_pretrained(out / "ckpt_early")
