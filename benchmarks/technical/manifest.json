@@ -1,0 +1,8 @@
+{
+  "name": "t3_technical",
+  "origin": "GLM hand-written tickets (non-template), gold mechanical",
+  "n": 20,
+  "empty_gold_n": 1,
+  "total_gold_facts": 49,
+  "sha256": "f1bcaec56ade5886b54593ab9f519dd02fc1036e7dde5f4a93f853a14c5987b7"
+}

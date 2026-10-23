@@ -1,0 +1,3 @@
+{"id": "smoke-1", "type": "gate", "stage": "smoke", "status": "PASS", "detail": "2 steps, finite loss 1.36->0.73, trainable 2162688", "ts": "2026-10-23T14:2x:00"}
+{"id": "tiny-1", "type": "gate", "stage": "tiny_overfit", "status": "PASS", "detail": "loss 0.00012 + 2/2 exact regeneration from saved adapter (incl. exact evidence spans)", "ts": "2026-10-23T14:5x:00"}
+{"id": "baseline-1", "type": "baseline", "model": "Qwen2.5-0.5B-Instruct@7ae55760", "status": "running", "detail": "dev/t1/t2/t3 done: f1=0.000, schema_valid=0.00, json_valid~0.95; sealed in progress", "ts": "2026-10-23T15:0x:00"}
