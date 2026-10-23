@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+dist/
+*.egg-info/
+
+# Experiment artifacts (regenerable)
+experiments/**/checkpoints/
+artifacts/
+
+# Local scratch
+.quarantine/
+*.local.json
+.DS_Store
