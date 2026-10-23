@@ -1,0 +1,33 @@
+{
+  "name": "t4_adversarial",
+  "pool": "sealed",
+  "n": 150,
+  "config": {
+    "name": "t4_adversarial",
+    "pool": "sealed",
+    "n": 150,
+    "seed_base": 530000,
+    "empty_rate": 0.3,
+    "negative_rate": 0.4,
+    "kind_weights": null,
+    "status_weights": {
+      "current": 0.3,
+      "historical": 0.3,
+      "hypothetical": 0.2,
+      "resolved": 0.2
+    },
+    "n_mentions": [
+      4,
+      9
+    ],
+    "family_filter": null,
+    "note": "sealed adversarial"
+  },
+  "quarantined": {
+    "no_matching_field": 78
+  },
+  "dropped_duplicates": 0,
+  "empty_gold_n": 74,
+  "pool_leaks": [],
+  "sha256": "1fb21b6bb60f6ca4e977b35432fcf2ad0b11d4e9e00562671dcf82ade25c06ba"
+}

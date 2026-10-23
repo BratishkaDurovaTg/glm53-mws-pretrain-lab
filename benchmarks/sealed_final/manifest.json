@@ -1,0 +1,28 @@
+{
+  "name": "sealed_final",
+  "pool": "sealed",
+  "n": 250,
+  "config": {
+    "name": "sealed_final",
+    "pool": "sealed",
+    "n": 250,
+    "seed_base": 540000,
+    "empty_rate": 0.3,
+    "negative_rate": 0.3,
+    "kind_weights": null,
+    "status_weights": null,
+    "n_mentions": [
+      2,
+      7
+    ],
+    "family_filter": null,
+    "note": "SEALED FINAL TEST - milestone verdicts only"
+  },
+  "quarantined": {
+    "no_matching_field": 190
+  },
+  "dropped_duplicates": 0,
+  "empty_gold_n": 114,
+  "pool_leaks": [],
+  "sha256": "ef9725efd0c11d7ca4fdb035bf75ee3a3ececf65ad948a1ac8fea68fabc42578"
+}

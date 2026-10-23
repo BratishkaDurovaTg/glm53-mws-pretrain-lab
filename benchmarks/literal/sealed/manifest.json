@@ -1,0 +1,44 @@
+{
+  "name": "t1_literal",
+  "pool": "sealed",
+  "n": 150,
+  "config": {
+    "name": "t1_literal",
+    "pool": "sealed",
+    "n": 150,
+    "seed_base": 510000,
+    "empty_rate": 0.25,
+    "negative_rate": 0.3,
+    "kind_weights": {
+      "error_code": 4,
+      "version": 4,
+      "uuid": 3,
+      "ip": 3,
+      "url": 2,
+      "host": 2,
+      "path": 2,
+      "resource_id": 2,
+      "ticket_ref": 1,
+      "datetime": 1,
+      "port": 1
+    },
+    "status_weights": null,
+    "n_mentions": [
+      2,
+      7
+    ],
+    "family_filter": [
+      "stacked_logs",
+      "rapid_chat",
+      "report_style"
+    ],
+    "note": "sealed literal"
+  },
+  "quarantined": {
+    "no_matching_field": 123
+  },
+  "dropped_duplicates": 0,
+  "empty_gold_n": 55,
+  "pool_leaks": [],
+  "sha256": "7d566a7e749c411ff29aa2a9b42ec527490bad165c01c6b652630d8091cbee02"
+}

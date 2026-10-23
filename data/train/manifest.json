@@ -1,0 +1,28 @@
+{
+  "name": "train",
+  "pool": "train",
+  "n": 2500,
+  "config": {
+    "name": "train",
+    "pool": "train",
+    "n": 2500,
+    "seed_base": 100000,
+    "empty_rate": 0.3,
+    "negative_rate": 0.3,
+    "kind_weights": null,
+    "status_weights": null,
+    "n_mentions": [
+      2,
+      7
+    ],
+    "family_filter": null,
+    "note": "SFT corpus, seen schemas/families"
+  },
+  "quarantined": {
+    "no_matching_field": 3
+  },
+  "dropped_duplicates": 0,
+  "empty_gold_n": 728,
+  "pool_leaks": [],
+  "sha256": "bb52f2afd76433f212601c172b46b4a8efcc8491b9545ee495f8c9578f5a00de"
+}

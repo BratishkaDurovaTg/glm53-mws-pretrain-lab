@@ -1,0 +1,33 @@
+{
+  "name": "t4_adversarial",
+  "pool": "dev",
+  "n": 200,
+  "config": {
+    "name": "t4_adversarial",
+    "pool": "dev",
+    "n": 200,
+    "seed_base": 330000,
+    "empty_rate": 0.3,
+    "negative_rate": 0.4,
+    "kind_weights": null,
+    "status_weights": {
+      "current": 0.3,
+      "historical": 0.3,
+      "hypothetical": 0.2,
+      "resolved": 0.2
+    },
+    "n_mentions": [
+      4,
+      9
+    ],
+    "family_filter": null,
+    "note": "near-miss candidates, distractors, competing statuses"
+  },
+  "quarantined": {
+    "no_matching_field": 9
+  },
+  "dropped_duplicates": 0,
+  "empty_gold_n": 58,
+  "pool_leaks": [],
+  "sha256": "7a884a57337634e702bcef57a9b6bdc0350684b9a7c4756feb0b1df2958299f0"
+}
