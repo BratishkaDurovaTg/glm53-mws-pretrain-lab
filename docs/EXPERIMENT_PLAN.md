@@ -102,3 +102,20 @@ only after KEEP. Reserve preserved for official MWS data. Ledger in
 
 No vLLM/constrained decoding; no quantization; no model zoo; no RL (permitted only after
 stable SFT + KEEP); no official-MWS guessing; reference repo stays untouched.
+
+## Research queue (owner-approved, one at a time, evidence-gated)
+
+1. [RUNNING] Exp2 — abstention/hard-negative batch2 (P1+batch2 vs P1).
+2. Exp3 — (d) natural-language breadth: GLM renderer over latent world-state + mechanical
+   gold (crooked RU, mixed RU/EN, logs, stack traces, support dialogues, command scraps,
+   doc paste-through). Strongest candidate after abstention.
+3. (e) counterfactual training: flip one fact, only corresponding output changes.
+4. (f) hard candidate ranking / contrastive auxiliary.
+5. (g) generator + small verifier (SUPPORTED/UNSUPPORTED/WRONG_VALUE) — strong vs over-extraction.
+6. (i) custom objective — only for a concrete surviving failure (copy/abstention/contrastive).
+7. (j) active learning loop over a large synthetic pool (uncertainty/conflict selection).
+8. (k) GLM distillation with deterministic verifier selection; gold stays mechanical where possible.
+9. (l) RL/GRPO — only when SFT saturates; reward from type/value F1 + abstention + unsupported.
+10. (m) ONE challenger model — only if Qwen-0.5B proven capacity-limited.
+11. (n) calibration/confidence thresholds once the official metric's precision/recall orientation is known.
+12. (h) offsets-as-postprocessing redesign + (o) few-shot adaptation study (1/5/10%) — AFTER official spec.
