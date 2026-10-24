@@ -1,0 +1,19 @@
+{
+  "stage": "pilot",
+  "steps": 313,
+  "n_examples": 2500,
+  "loss_first": 0.169921875,
+  "loss_last": 0.090362548828125,
+  "train_seconds": 3614.5,
+  "checkpoints": {
+    "ckpt_200": {
+      "dev_f1": 0.41584158415841577,
+      "step": 200
+    },
+    "ckpt_313": {
+      "dev_f1": 0.4693877551020408,
+      "step": 313
+    }
+  },
+  "eval": {}
+}

@@ -116,3 +116,58 @@ change, NOT a metric chase).
 - GLM tokens: ~10⁵–10⁶ order total; no paid teacher generation (gold mechanical).
 - Student compute: baseline ~2.2 h, pilot 67 min, evals ~1.5 h, sealed ~40 min.
 - This correction pass: rescoring only, zero new inference.
+
+---
+
+# EXPERIMENT 2 — abstention/hard-negative batch2 — REJECT
+
+## Design (single variable: training data distribution)
+
+P2 = pilot1/ckpt_best + continuation (1 epoch, 313 steps, same LoRA/optimizer/LR/
+batch/decoding/prompts/evaluator) on batch2: 2500 fresh examples — 45% empty-gold
+hard negatives (literal-rich scenes, kind present, schema filters exclude all),
+27.5% near-miss disambiguation (3–6 same-kind candidates, subset gold),
+27.5% mixed positive/negative schemas. Manifest `data/batch2/manifest.json`
+(sha256 8793a8c…). Continuation smoke PASS (loss starts 0.17 — P1 knowledge
+persisted). P1 frozen; identical eval protocol; paired stats vs P1.
+
+## Result: abstention achieved, extraction destroyed
+
+| metric | P1 | P2 | paired Δ (semantic tv) |
+| --- | --- | --- | --- |
+| no_fact_accuracy (dev) | 0.41 | **0.78** (T4: 0.91) | — target ≥0.70 MET |
+| precision / recall (dev) | 0.44 / 0.57 | **0.76 / 0.33** | recall −0.24 |
+| T2 unseen semantic F1 | 0.527 | 0.420 | **−0.175 [−0.226,−0.125] SIG** |
+| T4 adversarial semantic F1 | 0.535 | 0.343 | **−0.204 [−0.260,−0.148] SIG** (R 0.61→0.23) |
+| T3 technical | 0.406 | 0.305 | −0.133 [−0.258,−0.028] SIG |
+| dev semantic F1 | 0.516 | 0.455 | −0.125 [−0.188,−0.061] SIG |
+| T1 literal (micro) | 0.519 | 0.559 | −0.046 ns (fact-level micro up, per-record down) |
+| unsupported rate | 0.10–0.16 | **0.03–0.10** | improved |
+| exact-copy rate | 0.84–0.90 | **0.90–0.97** | improved |
+
+## VERDICT: REJECT
+
+Guardrails explicitly violated: T2 semantic regression is material and CI-solid;
+T4 crashed instead of remaining stable. The no-fact gain was purchased by a
+global under-emission prior — the exact trivial optimum the protocol warned
+about (precision solved by refusing to extract).
+
+## Why abstention targeting failed (analysis before any new branch)
+
+1. **Distribution pressure**: 45% empty + subset-gold near-misses (emit 1 of 3–5)
+   + a full epoch at unchanged LR = a strong, uniform push toward under-emission.
+2. **Capacity/style, not rule-learning**: at 0.5B the abstention decision appears
+   largely global (a decision-threshold shift), not schema-conditioned per-field
+   judgment — precision and recall moved together everywhere, including suites
+   whose data P2 never saw (T3 regression without any T3-like negatives).
+3. **No recall anchor**: no replay of pilot1 positives during continuation, so
+   nothing opposed the drift.
+
+## Actionable follow-ups (NOT auto-executed)
+
+- Milder knob along the same axis: empty share ~20%, positive replay, shorter
+  continuation — walks the P/R curve; intermediate checkpoints (e.g. ckpt_200)
+  likely already sit mid-curve. Cheap to probe, owner decides.
+- Precision without recall loss more plausibly comes from queue items (g)
+  generator+verifier or (n) calibration/threshold than from more SFT pressure.
+- The pre-model of record remains **pilot1/ckpt_best** (v0.1.0-pilot1).

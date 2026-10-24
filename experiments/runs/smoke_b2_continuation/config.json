@@ -1,0 +1,31 @@
+{
+  "stage": "smoke",
+  "train_path": "data/batch2/examples.jsonl",
+  "dev_path": "data/dev/examples.jsonl",
+  "output_dir": "experiments/runs/smoke_b2_continuation",
+  "lora_r": 16,
+  "lora_alpha": 32,
+  "lora_dropout": 0.05,
+  "target_modules": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj"
+  ],
+  "lr": 0.0001,
+  "warmup_steps": 20,
+  "max_steps": 600,
+  "batch_size": 1,
+  "grad_accum": 8,
+  "max_length": 2048,
+  "seed": 42,
+  "eval_every": 200,
+  "eval_subset": 60,
+  "tiny_examples": 2,
+  "tiny_steps": 120,
+  "smoke_steps": 2,
+  "save_limit": 3,
+  "init_adapter": "experiments/runs/pilot1/ckpt_best",
+  "n_train_examples": 8,
+  "steps": 2
+}

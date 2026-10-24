@@ -40,6 +40,7 @@ class SFTConfig:
     tiny_steps: int = 120
     smoke_steps: int = 2
     save_limit: int = 3  # early / best / final
+    init_adapter: str | None = None  # continuation: resume this LoRA, trainable
 
 
 def encode_example(tok, ex: TaskExample, cfg: SFTConfig) -> dict | None:
@@ -90,7 +91,7 @@ def collate(batch: list[dict], pad_id: int):
 
 def build_model(cfg: SFTConfig, model_path: Path = DEFAULT_MODEL_PATH):
     import torch
-    from peft import LoraConfig, get_peft_model
+    from peft import LoraConfig, PeftModel, get_peft_model
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     torch.manual_seed(cfg.seed)
@@ -103,10 +104,15 @@ def build_model(cfg: SFTConfig, model_path: Path = DEFAULT_MODEL_PATH):
         use_safetensors=True, dtype=torch.bfloat16)
     model.to("mps")
     model.config.use_cache = False
-    lora = LoraConfig(
-        r=cfg.lora_r, lora_alpha=cfg.lora_alpha, lora_dropout=cfg.lora_dropout,
-        target_modules=cfg.target_modules, bias="none", task_type="CAUSAL_LM")
-    model = get_peft_model(model, lora)
+    if cfg.init_adapter:
+        # continuation: resume the previous LoRA weights, keep them trainable
+        model = PeftModel.from_pretrained(
+            model, cfg.init_adapter, is_trainable=True)
+    else:
+        lora = LoraConfig(
+            r=cfg.lora_r, lora_alpha=cfg.lora_alpha, lora_dropout=cfg.lora_dropout,
+            target_modules=cfg.target_modules, bias="none", task_type="CAUSAL_LM")
+        model = get_peft_model(model, lora)
     model.print_trainable_parameters()
     return model, tok
 
