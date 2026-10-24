@@ -1,0 +1,22 @@
+{
+  "name": "batch2_abstention",
+  "n": 2500,
+  "target_mix": {
+    "empty_hard_negative": 1125,
+    "near_miss": 690,
+    "mixed": 685
+  },
+  "achieved": {
+    "make_empty_hard_negative": 1125,
+    "make_near_miss": 690,
+    "make_mixed": 685
+  },
+  "empty_gold_n": 1125,
+  "empty_gold_share": 0.45,
+  "quarantined": {
+    "empty_message": 265,
+    "no_subset_selector": 22
+  },
+  "seed_base": 700000,
+  "sha256": "8793a8c804477955eb847e40b5e7651448a843627076b789f393aed114c764bc"
+}
