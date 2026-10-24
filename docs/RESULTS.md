@@ -1,4 +1,13 @@
-# RESULTS — pilot1 (pre-spec stage 1) — FINAL
+# RESULTS — pilot1 (pre-spec stage 1) — CORRECTED SCORING
+
+## Correction note (owner review, this revision)
+
+The previously reported "strict full grounded F1" was in fact **message-grounded**
+(identity `(type, value, message_id)`); it never checked `start/end`. Historical
+numbers remain reproducible under the renamed `message_grounded_f1` (the `f1`
+aggregate key is kept as a documented alias). New `exact_grounded_*` metrics use
+the full 5-tuple identity. The claim "evidence mechanics learned essentially
+perfectly" was WRONG and is retracted: it compared message ids, not spans.
 
 ## Setup
 
@@ -6,92 +15,104 @@
 - SFT: LoRA r=16 α=32 (q,k,v,o) — 2,162,688 trainable (0.44%), 2500 mechanical-gold
   schema-conditioned examples (~29% empty-gold hard negatives), 1 epoch = 313 steps,
   effective batch 8, bf16 completion-only CE, cosine 1e-4, warmup 20. Wall: 67 min.
-- Gates: smoke PASS; tiny-overfit PASS (loss 1.36→0.0001 AND 2/2 exact regeneration
-  from the saved adapter, exact evidence spans included).
-- Checkpoints: early(78) / best-by-dev-gen-F1(313) / final(313) — best == final.
+- Gates: smoke PASS; tiny-overfit PASS (loss→0.0001 AND 2/2 exact regeneration of
+  full JSON targets — offsets included — from overfit memory; NOT evidence of
+  offset competence on unseen data).
 
-## Base vs tuned (strict full grounded F1: type+value+message_id+exact span)
+## Corrected results — claims separated
 
-| suite | base strict | base lenient (type,value) | tuned strict | tuned tv_f1 | schema_valid | paired Δ [95% CI] |
-| --- | --- | --- | --- | --- | --- | --- |
-| dev | 0.000 | 0.261 | **0.499** | 0.516 | 1.00 | +0.247 [+0.141,+0.351] ✓ |
-| T1 literal | 0.000 | 0.251 | **0.522** | 0.522 | 0.99 | +0.240 [+0.140,+0.338] ✓ |
-| T2 unseen-schema | 0.000 | 0.209 | **0.527** | 0.527 | 1.00 | +0.137 [+0.043,+0.230] ✓ |
-| T4 adversarial | 0.000 | 0.213 | **0.531** | 0.535 | 0.99 | +0.257 [+0.166,+0.347] ✓ |
-| T3 technical (hand-written) | 0.000 | 0.500 | **0.406** | 0.406 | 1.00 | +0.348 [+0.143,+0.540] ✓ |
+### 1. FORMAT LEARNING — strong
 
-Paired Δ computed on per-record strict F1 (empty↔empty credits 1.0 to both sides;
-base gets vacuous credit on empty-gold records — the DELTA is the meaningful number).
+schema_valid 0.00 → **0.99–1.00** on every suite (dev side). json_valid stays high.
+The canonical `{"facts":[{type,value,evidence}]}` contract was learned.
 
-### SEALED milestone (aggregates only, run once)
+### 2. SEMANTIC EXTRACTION — significant on template-adjacent + unseen schemas; NOT demonstrated on out-of-template text
 
-| suite | base lenient tv | tuned strict F1 | schema | unsup |
+Apples-to-apples: same lenient (type,value) harvester applied to BOTH raw outputs.
+
+| suite | base tv | tuned tv | paired Δ [95% CI] | verdict |
 | --- | --- | --- | --- | --- |
-| T1 literal sealed | 0.080 | **0.337** | 0.99 | 0.18 |
-| T2 unseen-schema sealed | 0.119 | **0.319** | 1.00 | 0.23 |
-| T4 adversarial sealed | 0.073 | **0.333** | 0.99 | 0.03 |
-| SEALED FINAL | 0.085 | **0.367** | 1.00 | 0.15 |
+| **T2 unseen-schema** | 0.209 | 0.527 | **+0.203 [+0.151,+0.253]** | SIG |
+| T4 adversarial | 0.213 | 0.533 | +0.223 [+0.167,+0.279] | SIG |
+| T1 literal | 0.251 | 0.519 | +0.209 [+0.149,+0.272] | SIG |
+| dev | 0.261 | 0.516 | +0.193 [+0.120,+0.264] | SIG |
+| T3 technical (hand-written) | 0.500 | 0.406 | −0.111 [−0.270,+0.049] | **ns** |
 
-Sealed direction is CONSISTENT with dev-side (no contradiction; lower absolute —
-everything unseen: structures, schemas, literal pools, higher empty share).
+Unseen-SCHEMA transfer is real (T2 CI-solid). On hand-written out-of-template
+text the base already extracted ~0.50 semantically and the pilot added nothing
+(numerically negative, not significant). Breadth of semantic transfer beyond
+the template distribution is UNPROVEN.
 
-## Diagnostic decomposition (owner-requested)
+### 3. MESSAGE GROUNDING — strong
 
-- `tv_f1 ≈ strict f1` almost everywhere → **evidence/serialization mechanics were
-  learned essentially perfectly** (evidence_accuracy_given_tv ≈ 1.0).
-- Base had hidden semantics (lenient tv 0.21–0.50) blocked by serialization;
-  tuned roughly doubled semantic quality (T2: 0.209→0.527) AND fixed serialization
-  (schema 0.00→1.00). Both components improved — not just format learning.
-- type_f1 (0.61–0.70 dev side) > tv_f1 → residual errors are mostly wrong VALUE
-  selection among candidates, not wrong field choice.
+`(type,value,message_id)` F1: 0.000 → **0.499–0.531** (all suites, paired CIs
++0.39–0.44, SIG). message_accuracy_given_tv ≈ 1.0: when the fact is right, the
+right message is cited.
 
-## Failure modes (t2+t4 dev-side clustering)
+### 4. EXACT SPAN GROUNDING — FAILED
 
-| bucket | count |
-| --- | --- |
-| false-positive on empty gold | 91 |
-| wrong selection (fp+fn mixed) | 58 |
-| over-extraction (fp only) | 44 |
-| unsupported value | 32 |
-| total miss | 31 |
-| under-extraction (fn only) | 23 |
+`exact_grounded_f1` = **0.000–0.004** everywhere (paired Δ ns). Worse:
+`evidence_valid_rate` (source-consistency: `content[start:end] == value`) is
+0.000–0.011 — the generated offsets do not even slice out the model's own value.
+The model emits plausible integer offsets without character counting.
 
-**Dominant: over-extraction / abstention failure** (no_fact_accuracy 0.26–0.52 dev
-side). The model prefers guessing over abstaining. T3 shows the opposite face:
-conservative recall (R=0.286) on out-of-template text — decision style tuned to the
-template distribution.
+**Assessment (§9, documented not implemented):** this is primarily an
+OUTPUT-DESIGN problem, not just a model problem. Asking a 0.5B BPE-decoder to
+count Unicode codepoints is brittle by construction. Candidate architecture if
+official MWS requires offsets: model predicts `(type, exact value, message_id)`;
+a deterministic postprocessor derives `start/end` by locating the value in the
+cited message (unique occurrence) with occurrence-aware disambiguation
+otherwise. Decision deferred to official requirements — do NOT re-engineer
+outputs for synthetic metrics.
 
-## Verdict
+### 5. ABSTENTION — weak
 
-**KEEP (conditional).** The core hypothesis — schema-conditioned synthetic SFT
-creates transferable extraction behaviour on unseen schemas — is supported on every
-independent suite (dev, T1, T2, T4, T3) with significant paired CIs, and confirmed
-in direction by the sealed milestone (0.32–0.37 strict from 0.00). Caveats kept on
-record: (1) abstention is the top weakness; (2) T3 out-of-template recall is low;
-(3) all of this remains synthetic/domain-proxy — the decisive test is official MWS
-data via `docs/48H_HANDOFF.md`.
+no_fact_accuracy 0.26–0.52 (dev side); over-extraction dominates failures
+(91 FP-on-empty + 44 over vs 54 under in t2+t4 clustering).
 
-## Next single highest-value experiment (ONE)
+### SEALED milestone (aggregates only; exact-grounded not recomputable — per-example raws destroyed by sealed boundary; next milestone will report it)
 
-Error-driven batch 2 targeting **abstention/hard negatives**: raise empty-gold +
-distractor share and near-miss candidate density (t4-style) in a ~2–3k addition,
-retrain same recipe, re-evaluate frozen suites; success criterion = no_fact_accuracy
-≥0.7 on dev side without T2 regression beyond CI. No scaling to 20k, no RL, no new
-branches before that reads out.
+message-grounded: T1s 0.337 / T2s 0.319 / T4s 0.333 / final 0.367 (base 0.000;
+base lenient tv 0.073–0.119), schema 0.99–1.00. Direction consistent with dev.
+
+## Verdict — CORRECTED
+
+**KEEP-CONDITIONAL, scope sharpened.**
+
+Supported by evidence:
+- canonical format following (0→1);
+- semantic (type,value) extraction on unseen schemas: +0.20 CI[+0.15,+0.25];
+- message-level grounding: +0.39 CI-solid.
+
+Not supported / failed:
+- semantic transfer to out-of-template hand-written text (T3 ns);
+- exact character offsets (failed; likely output-design, see §4);
+- abstention (weak).
+
+The pre-model is useful as an initializer IF official MWS scoring rewards
+(type/value/message)-level extraction or tolerates programmatic span derivation —
+decisive test remains the official data via `docs/48H_HANDOFF.md`.
+
+## Next single highest-value experiment
+
+Unchanged candidate (abstention batch 2), but the corrected decomposition adds a
+candidate: T3-style out-of-template semantic breadth. Owner decides which ONE:
+(a) abstention/hard-negative batch 2; (b) out-of-template semantic breadth probe
+(hand-written-style training data); (c) drop offsets from the canonical target
+and re-baseline (only if we accept offsets as postprocessing — an output-design
+change, NOT a metric chase).
 
 ## Honest limitations
 
 1. Everything is synthetic/hand-written proxy; not MWS quality.
-2. Frame bank shared across template families (isolation is structural).
-3. "Resolved" wording + dates reads oddly; log-line uuid under `lvl=err` is a
-   superficial distractor (definitions disambiguate).
-4. HTTP codes/ports are shared closed pools.
-5. Base no_fact_accuracy (vacuous 1.0) vs tuned (real) is not a like-for-like
-   comparison; over-extraction is measured against gold, not against base.
-6. Sealed boundary is procedural (aggregate-only tooling), not physical.
+2. Frame bank shared across template families (structural isolation only).
+3. Historical "f1" numbers = message-grounded; do not cite as span-exact.
+4. Sealed exact-grounded pending next milestone run (boundary policy).
+5. Base no_fact_accuracy (vacuous 1.0) vs tuned (real) not like-for-like.
+6. Sealed boundary is procedural, not physical.
 
 ## Token / compute economics
 
-- GLM tokens: ~10⁵–10⁶ order total (design, code, review, T3 hand-rendering) —
-  far under stage ceilings; no paid teacher generation (gold is mechanical).
+- GLM tokens: ~10⁵–10⁶ order total; no paid teacher generation (gold mechanical).
 - Student compute: baseline ~2.2 h, pilot 67 min, evals ~1.5 h, sealed ~40 min.
+- This correction pass: rescoring only, zero new inference.

@@ -33,8 +33,9 @@ SUITES = {
     "sealed_final": ROOT / "benchmarks" / "sealed_final" / "examples.jsonl",
 }
 
-KEYS = ["f1", "type_value_f1", "type_f1", "evidence_accuracy_given_tv",
-        "value_exact_match_given_type", "schema_valid_rate", "json_valid_rate",
+KEYS = ["message_grounded_f1", "exact_grounded_f1", "type_value_f1", "type_f1",
+        "message_accuracy_given_tv", "exact_span_accuracy_given_tv",
+        "evidence_valid_rate", "schema_valid_rate", "json_valid_rate",
         "unsupported_fact_rate", "no_fact_accuracy"]
 
 
@@ -77,7 +78,9 @@ if __name__ == "__main__":
     dest = run_dir / "diagnostics.json"
     dest.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     for suite, m in result.items():
-        print(f"{suite}: strict={m['f1']:.3f} tv={m['type_value_f1']:.3f} "
+        print(f"{suite}: msg_f1={m['message_grounded_f1']:.3f} "
+              f"EXACT_f1={m['exact_grounded_f1']:.3f} tv={m['type_value_f1']:.3f} "
               f"lenient_tv={m['lenient_type_value_f1']:.3f} "
-              f"type_f1={m['type_f1']:.3f} schema={m['schema_valid_rate']:.2f}")
+              f"span_given_tv={m['exact_span_accuracy_given_tv']} "
+              f"src_valid={m['evidence_valid_rate']:.3f}")
     print("->", dest)
