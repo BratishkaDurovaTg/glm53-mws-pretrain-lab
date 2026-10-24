@@ -105,8 +105,8 @@ stable SFT + KEEP); no official-MWS guessing; reference repo stays untouched.
 
 ## Research queue (owner-approved, one at a time, evidence-gated)
 
-1. [RUNNING] Exp2 — abstention/hard-negative batch2 (P1+batch2 vs P1).
-2. Exp3 — (d) natural-language breadth: GLM renderer over latent world-state + mechanical
+1. [REJECTED] Exp2 — abstention/hard-negative batch2: aggressive abstention-continuation caused GLOBAL UNDER-EMISSION (recall collapse, T2/T4 semantic regressions CI-solid). Correct scope: this RECIPE failed; NOT evidence that Qwen2.5-0.5B is incapable of schema-conditioned abstention.
+2. [RUNNING] Exp3 — (d) natural-language breadth: GLM renderer over latent world-state + mechanical
    gold (crooked RU, mixed RU/EN, logs, stack traces, support dialogues, command scraps,
    doc paste-through). Strongest candidate after abstention.
 3. (e) counterfactual training: flip one fact, only corresponding output changes.
