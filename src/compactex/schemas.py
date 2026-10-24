@@ -63,6 +63,16 @@ LiteralKind = Literal[
     "resource_id",
     "ticket_ref",
     "datetime",
+    # consumer-service kinds (T5_CONSUMER_SERVICE evaluation; documented additions)
+    "money_amount",
+    "phone_number",
+    "account_number",
+    "order_id",
+    "application_id",
+    "transaction_id",
+    "tariff_name",
+    "service_name",
+    "device_name",
 ]
 
 StatusFilter = Literal["any", "current", "historical", "hypothetical", "resolved"]

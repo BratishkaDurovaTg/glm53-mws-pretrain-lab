@@ -1,0 +1,8 @@
+{
+  "name": "consumer_slice",
+  "origin": "hand-authored (handwritten_t5_consumer), gold mechanical, pool=dev",
+  "n": 110,
+  "empty_gold_n": 7,
+  "total_gold_facts": 212,
+  "sha256": "2f5d26bc5b9446a77c79c1715fa584ef2caff22e2572a38faa873c6aa3427302"
+}

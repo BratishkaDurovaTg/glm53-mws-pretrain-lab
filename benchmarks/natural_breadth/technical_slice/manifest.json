@@ -1,0 +1,8 @@
+{
+  "name": "technical_slice",
+  "origin": "hand-authored (handwritten_t5), gold mechanical, pool=dev",
+  "n": 110,
+  "empty_gold_n": 3,
+  "total_gold_facts": 284,
+  "sha256": "c7116e85a97cb37bfeba3748e0c3ba2672cfd1bbc963e6dff6a53293a6cef469"
+}

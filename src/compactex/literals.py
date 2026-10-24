@@ -106,6 +106,62 @@ def gen_url(pool: str, rng: random.Random) -> str:
     return f"https://{gen_host(pool, rng)}{'/' + _hex(rng, 5) if rng.random() < 0.5 else ''}"
 
 
+# --- consumer-service kinds (evaluation-side; pool markers not maintained: pool_of_value returns None) ---
+_TARIFF_BANK = {
+    "train": ["Базовый", "Смарт", "Для дома"],
+    "dev": ["Максимум", "Твой выбор", "Семейный", "Безлимит", "Оптимум"],
+    "sealed": ["Прайм", "Комфорт", "Эксперт"],
+}
+_SERVICE_BANK = {
+    "train": ["Гудок", "Второй номер"],
+    "dev": ["Кто звонил", "Чёрный список", "Антиопределитель", "Облако 512",
+            "Родительский контроль", "Защита экрана"],
+    "sealed": ["Локатор", "Моя записная книжка"],
+}
+_DEVICE_BANK = {
+    "train": ["iPhone 13 mini", "Galaxy A33"],
+    "dev": ["iPhone SE", "Galaxy S22", "Redmi Note 12", "Huawei P40", "Nokia G21",
+            "iPhone 14 Pro"],
+    "sealed": ["Pixel 7a", "Xperia 10"],
+}
+
+
+def gen_money_amount(pool: str, rng: random.Random) -> str:
+    return f"{rng.randint(600, 1999)} руб."
+
+
+def gen_phone_number(pool: str, rng: random.Random) -> str:
+    return f"+7 9{rng.randint(10, 99)} {rng.randint(100, 999)}-{rng.randint(10, 99)}-{rng.randint(10, 99)}"
+
+
+def gen_account_number(pool: str, rng: random.Random) -> str:
+    return "".join(str(rng.randint(4, 6)) + "".join(str(rng.randint(0, 9)) for _ in range(9)))
+
+
+def gen_order_id(pool: str, rng: random.Random) -> str:
+    return f"ORD-{rng.randint(4, 6)}{rng.randint(10**6, 10**7 - 1)}"
+
+
+def gen_application_id(pool: str, rng: random.Random) -> str:
+    return f"APP-{rng.randint(4, 6)}{rng.randint(10**5, 10**6 - 1)}"
+
+
+def gen_transaction_id(pool: str, rng: random.Random) -> str:
+    return f"TXN-{rng.randint(4, 6)}{rng.randint(10**7, 10**8 - 1)}"
+
+
+def gen_tariff_name(pool: str, rng: random.Random) -> str:
+    return rng.choice(_TARIFF_BANK[pool])
+
+
+def gen_service_name(pool: str, rng: random.Random) -> str:
+    return rng.choice(_SERVICE_BANK[pool])
+
+
+def gen_device_name(pool: str, rng: random.Random) -> str:
+    return rng.choice(_DEVICE_BANK[pool])
+
+
 GENERATORS: dict[LiteralKind, Callable[[str, random.Random], str]] = {
     "error_code": gen_error_code,
     "version": gen_version,
@@ -118,6 +174,15 @@ GENERATORS: dict[LiteralKind, Callable[[str, random.Random], str]] = {
     "resource_id": gen_resource_id,
     "ticket_ref": gen_ticket_ref,
     "datetime": gen_datetime,
+    "money_amount": gen_money_amount,
+    "phone_number": gen_phone_number,
+    "account_number": gen_account_number,
+    "order_id": gen_order_id,
+    "application_id": gen_application_id,
+    "transaction_id": gen_transaction_id,
+    "tariff_name": gen_tariff_name,
+    "service_name": gen_service_name,
+    "device_name": gen_device_name,
 }
 
 PLACEHOLDER_BY_KIND: dict[LiteralKind, str] = {
@@ -132,6 +197,15 @@ PLACEHOLDER_BY_KIND: dict[LiteralKind, str] = {
     "resource_id": "RES",
     "ticket_ref": "TKT",
     "datetime": "DTE",
+    "money_amount": "AMT",
+    "phone_number": "PHN",
+    "account_number": "ACC",
+    "order_id": "ORD",
+    "application_id": "APP",
+    "transaction_id": "TXN",
+    "tariff_name": "TAR",
+    "service_name": "SRV",
+    "device_name": "DEV",
 }
 
 

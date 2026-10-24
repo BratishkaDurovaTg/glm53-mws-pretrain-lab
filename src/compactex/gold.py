@@ -23,6 +23,15 @@ KIND_NAME = {
     "resource_id": "RESOURCE_ID",
     "ticket_ref": "TICKET_REF",
     "datetime": "DATE",
+    "money_amount": "MONEY_AMOUNT",
+    "phone_number": "PHONE_NUMBER",
+    "account_number": "ACCOUNT_NUMBER",
+    "order_id": "ORDER_ID",
+    "application_id": "APPLICATION_ID",
+    "transaction_id": "TRANSACTION_ID",
+    "tariff_name": "TARIFF_NAME",
+    "service_name": "SERVICE_NAME",
+    "device_name": "DEVICE_NAME",
 }
 
 KIND_PLURAL = {
@@ -37,6 +46,15 @@ KIND_PLURAL = {
     "resource_id": "resource identifiers",
     "ticket_ref": "ticket references",
     "datetime": "dates",
+    "money_amount": "monetary amounts",
+    "phone_number": "phone numbers",
+    "account_number": "account numbers",
+    "order_id": "order identifiers",
+    "application_id": "application identifiers",
+    "transaction_id": "transaction identifiers",
+    "tariff_name": "tariff names",
+    "service_name": "service names",
+    "device_name": "device names",
 }
 
 STATUS_MODIFIER = {

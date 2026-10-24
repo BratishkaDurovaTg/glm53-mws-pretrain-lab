@@ -50,7 +50,7 @@ def substitute_and_locate(
         spans[mention.token] = (mention.message_index, value, start, start + len(value))
     # placeholder leakage check: no leftover tokens like ERR_9 in final text
     joined = "\n".join(final)
-    leftover = re.search(r"\b(?:ERR|VER|UID|IP|URL|HST|PRT|PTH|RES|TKT|DTE)_\d+\b", joined)
+    leftover = re.search(r"\b(?:ERR|VER|UID|IP|URL|HST|PRT|PTH|RES|TKT|DTE|AMT|PHN|ACC|ORD|APP|TXN|TAR|SRV|DEV)_\d+\b", joined)
     if leftover:
         raise RenderAmbiguous(f"unsubstituted token {leftover.group(0)!r}")
     return final, spans
