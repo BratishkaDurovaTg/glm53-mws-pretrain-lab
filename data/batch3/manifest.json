@@ -1,0 +1,28 @@
+{
+  "name": "batch3_natural_breadth",
+  "n_total": 3500,
+  "n_new": 2500,
+  "n_replay": 1000,
+  "empty_gold_n_new": 649,
+  "families": [
+    "natural:casual_chat",
+    "natural:casual_chat_long",
+    "natural:config_paste",
+    "natural:eng_slack",
+    "natural:incident_report",
+    "natural:incident_report_en",
+    "natural:logs_in_prose",
+    "natural:logs_in_prose_en",
+    "natural:quoted_history",
+    "natural:ruen_mix",
+    "natural:stack_trace",
+    "natural:terminal_user",
+    "natural:terse_msg",
+    "natural:verbose_noisy"
+  ],
+  "quarantined": {
+    "render_ambiguous": 1066
+  },
+  "seed_base": 900000,
+  "sha256": "912a953966c8fb7f668707309ff3c0373d2118e37db9c0554676d6678cb2e1d5"
+}
